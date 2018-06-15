@@ -19,7 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         window?.makeKeyAndVisible()
         
-        window?.rootViewController = ViewController()
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        let movieDetailController = MovieDetailController(collectionViewLayout: layout)
+        let navController = CustomNavigationController(rootViewController: movieDetailController)
+        
+        window?.rootViewController = navController
         
         return true
     }
