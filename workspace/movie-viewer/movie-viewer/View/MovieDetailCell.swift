@@ -10,6 +10,18 @@ import UIKit
 
 class MovieDetailCell: UICollectionViewCell {
     
+    var movie: Movie? {
+        didSet {
+            setupTextViewAttributedText()
+            
+            guard let posterLandscapeUrl = movie?.posterLandscape else { return }
+            posterLandscapeImageView.imageFromUrl(urlString: posterLandscapeUrl)
+            
+            guard let posterUrl = movie?.poster else { return }
+            posterImageView.imageFromUrl(urlString: posterUrl)
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -18,20 +30,16 @@ class MovieDetailCell: UICollectionViewCell {
         setupViews()
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    let posterLandscapeImageView: UIImageView = {
-        let iv = UIImageView()
+    let posterLandscapeImageView: CustomImageView = {
+        let iv = CustomImageView()
         iv.backgroundColor = .lightGray
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
         return iv
     }()
     
-    let posterImageView: UIImageView = {
-        let iv = UIImageView()
+    let posterImageView: CustomImageView = {
+        let iv = CustomImageView()
         iv.backgroundColor = .lightGray
         iv.contentMode = .scaleAspectFill
         iv.clipsToBounds = true
@@ -68,37 +76,41 @@ class MovieDetailCell: UICollectionViewCell {
         
         posterImageView.anchor(top: posterLandscapeImageView.bottomAnchor, leading: leadingAnchor, bottom: nil, trailing: nil, padding: UIEdgeInsets(top: 16, left: 16, bottom: 0, right: 0), size: CGSize(width: frame.width / 2.5, height: frame.height / 2.5))
         
-        setupTextViewAttributedText()
-        
         detailsTextView.anchor(top: posterImageView.topAnchor, leading: posterImageView.trailingAnchor, bottom: viewSeatButton.topAnchor, trailing: trailingAnchor, padding: UIEdgeInsets(top: 0, left: 16, bottom: 8, right: 16))
         
         viewSeatButton.anchor(top: nil, leading: leadingAnchor, bottom: bottomAnchor, trailing: trailingAnchor, size: CGSize(width: 0, height: 50))
     }
     
     fileprivate func setupTextViewAttributedText() {
+        guard let movie = movie else { return }
+        
         let detailsMutableAttibutedString = NSMutableAttributedString()
         
         let nameAttributedString = NSMutableAttributedString(string: "Name:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        nameAttributedString.append(NSAttributedString(string: "Ghost in the Shell\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        nameAttributedString.append(NSAttributedString(string: "\(movie.canonicalTitle)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let genreAttributedString = NSMutableAttributedString(string: "Genre:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        genreAttributedString.append(NSAttributedString(string: "Action, Crime, Drama\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        genreAttributedString.append(NSAttributedString(string: "\(movie.genre)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let advisoryAttributedString = NSMutableAttributedString(string: "Advisory Rating:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        advisoryAttributedString.append(NSAttributedString(string: "PG\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        advisoryAttributedString.append(NSAttributedString(string: "\(movie.advisoryRating)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let durationAttributedString = NSMutableAttributedString(string: "Duration:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        durationAttributedString.append(NSAttributedString(string: "2 hrs\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        durationAttributedString.append(NSAttributedString(string: "\(movie.runtimeMins)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let releaseDateAttributedString = NSMutableAttributedString(string: "Release Date:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        releaseDateAttributedString.append(NSAttributedString(string: "2018-06-01\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        releaseDateAttributedString.append(NSAttributedString(string: "\(movie.releaseDate)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let synopsisAttributedString = NSMutableAttributedString(string: "Synopsis:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        synopsisAttributedString.append(NSAttributedString(string: "A cyborg police woman attempts to bring down a nefarious computer hacker.", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        synopsisAttributedString.append(NSAttributedString(string: "\(movie.synopsis)", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         [nameAttributedString, genreAttributedString, advisoryAttributedString, durationAttributedString, releaseDateAttributedString, synopsisAttributedString].forEach({detailsMutableAttibutedString.append($0)})
         
         detailsTextView.attributedText = detailsMutableAttibutedString
         
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }
