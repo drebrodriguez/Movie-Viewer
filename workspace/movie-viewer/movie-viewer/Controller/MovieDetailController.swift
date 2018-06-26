@@ -17,10 +17,9 @@ class MovieDetailController: UICollectionViewController, UICollectionViewDelegat
         super.viewDidLoad()
         
         navigationItem.title = "Movie Viewer"
-        
         setupCollectionViews()
-        fetchMovie()
         
+        fetchMovieDetails()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -32,12 +31,11 @@ class MovieDetailController: UICollectionViewController, UICollectionViewDelegat
         
     }
     
-    fileprivate func fetchMovie() {
-        print("Fetching movies...")
+    fileprivate func fetchMovieDetails() {
         let urlString = "http://ec2-52-76-75-52.ap-southeast-1.compute.amazonaws.com/movie.json"
         guard let url = URL(string: urlString) else { return }
         
-        URLSession.shared.dataTask(with: url) { (data, _, err) in
+        URLSession.shared.dataTask(with: url) { (data, response, err) in
             if let err = err {
                 print("Failed to fetch json from url:", err.localizedDescription)
                 return
@@ -63,7 +61,14 @@ class MovieDetailController: UICollectionViewController, UICollectionViewDelegat
     
 }
 
-extension MovieDetailController {
+extension MovieDetailController: MovieDetailCellDelegate {
+    func didTapViewSeat(movie: Movie) {
+        let seatMapController = SeatMapController()
+        seatMapController.movie = movie
+        
+        navigationController?.pushViewController(seatMapController, animated: true)
+    }
+    
     fileprivate func setupCollectionViews() {
         collectionView?.backgroundColor = UIColor.Custom.edgarWhite
         collectionView?.register(MovieDetailCell.self, forCellWithReuseIdentifier: cellId)
@@ -75,6 +80,7 @@ extension MovieDetailController {
         let cell =  collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath) as! MovieDetailCell
         
         cell.movie = self.movies[indexPath.item]
+        cell.delegate = self
         
         return cell
     }

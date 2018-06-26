@@ -8,7 +8,13 @@
 
 import UIKit
 
+protocol MovieDetailCellDelegate {
+    func didTapViewSeat(movie: Movie)
+}
+
 class MovieDetailCell: UICollectionViewCell {
+    
+    var delegate: MovieDetailCellDelegate?
     
     var movie: Movie? {
         didSet {
@@ -19,6 +25,7 @@ class MovieDetailCell: UICollectionViewCell {
             
             guard let posterUrl = movie?.poster else { return }
             posterImageView.imageFromUrl(urlString: posterUrl)
+            
         }
     }
     
@@ -64,7 +71,8 @@ class MovieDetailCell: UICollectionViewCell {
     }()
     
     @objc fileprivate func handleViewSeat() {
-        print("view seat pressed")
+        guard let movie = self.movie else { return }
+        delegate?.didTapViewSeat(movie: movie)
     }
     
     fileprivate func setupViews() {
@@ -96,15 +104,18 @@ class MovieDetailCell: UICollectionViewCell {
         advisoryAttributedString.append(NSAttributedString(string: "\(movie.advisoryRating)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let durationAttributedString = NSMutableAttributedString(string: "Duration:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        durationAttributedString.append(NSAttributedString(string: "\(movie.runtimeMins)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        durationAttributedString.append(NSAttributedString(string: "\(movie.runtimeMins.formattedTime())\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let releaseDateAttributedString = NSMutableAttributedString(string: "Release Date:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        releaseDateAttributedString.append(NSAttributedString(string: "\(movie.releaseDate)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        releaseDateAttributedString.append(NSAttributedString(string: "\(movie.releaseDate.formattedDate())\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
         let synopsisAttributedString = NSMutableAttributedString(string: "Synopsis:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
-        synopsisAttributedString.append(NSAttributedString(string: "\(movie.synopsis)", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        synopsisAttributedString.append(NSAttributedString(string: "\(movie.synopsis)\n\n", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
         
-        [nameAttributedString, genreAttributedString, advisoryAttributedString, durationAttributedString, releaseDateAttributedString, synopsisAttributedString].forEach({detailsMutableAttibutedString.append($0)})
+        let castAttributedString = NSMutableAttributedString(string: "Cast:\n", attributes: [NSAttributedStringKey.font: UIFont.systemFont(ofSize: 14)])
+        castAttributedString.append(NSAttributedString(string: "\(movie.cast.joined(separator: ", "))", attributes: [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 14)]))
+        
+        [nameAttributedString, genreAttributedString, advisoryAttributedString, durationAttributedString, releaseDateAttributedString, synopsisAttributedString, castAttributedString].forEach({detailsMutableAttibutedString.append($0)})
         
         detailsTextView.attributedText = detailsMutableAttibutedString
         
