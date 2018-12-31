@@ -1,2 +1,2 @@
 # Movie-Viewer
-A simple movie booking app with REST JSON API integration.
+A simple movie booking app with REST API and JSON integration.
